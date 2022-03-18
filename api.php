@@ -5536,14 +5536,15 @@ namespace Tqdev\PhpCrudApi\Database {
         {
             switch ($this->driver) {
                 case 'mysql':
-                    return "$this->driver:host=$this->address;port=$this->port;dbname=$this->database;charset=utf8mb4";
+                    return "$this->driver:dbname=$this->database;unix_socket=/cloudsql/$this->address";
+                    //return "$this->driver:host=$this->address;port=$this->port;dbname=$this->database;charset=utf8mb4";
                 case 'pgsql':
                     return "$this->driver:host=$this->address port=$this->port dbname=$this->database options='--client_encoding=UTF8'";
                 case 'sqlsrv':
                     return "$this->driver:Server=$this->address,$this->port;Database=$this->database";
                 case 'sqlite':
                     return "$this->driver:$this->address";
-                case 'unix_sockets':
+                case 'unix_socket':
                     return "$this->driver:dbname=$this->database;unix_socket=$this->address/$this->port";
             }
         }
@@ -12058,13 +12059,20 @@ namespace Tqdev\PhpCrudApi {
     use Tqdev\PhpCrudApi\ResponseUtils;
 
     $config = new Config([
-        // 'driver' => 'mysql',
-        // 'address' => 'localhost',
-        // 'port' => '3306',
-        'username' => 'php-crud-api',
-        'password' => 'php-crud-api',
-        'database' => 'php-crud-api',
-        // 'debug' => false
+        'driver' => 'mysql', //'unix_socket',
+        'address' => getenv("DB_SOCKET_ADDRESS"),
+        //'port' => getenv("DB_SOCKET_PORT"),
+        'username' => getenv("DB_USERNAME"),
+        'password' => getenv("DB_PASSWORD"),
+        'database' => getenv("DB_NAME"),
+        //'debug' => true,
+        'tables' => 'clients,configs',
+        'controllers' => 'records,status',
+        'middlewares' => 'cors,json,apiKeyDbAuth',
+        'apiKeyDbAuth.mode' => 'required',
+        'apiKeyDbAuth.header' => 'X-API-Key',
+        'apiKeyDbAuth.usersTable' => 'users',
+        'apiKeyDbAuth.apiKeyColumn' => 'api_key'
     ]);
     $request = RequestFactory::fromGlobals();
     $api = new Api($config);
