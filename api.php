@@ -5543,6 +5543,8 @@ namespace Tqdev\PhpCrudApi\Database {
                     return "$this->driver:Server=$this->address,$this->port;Database=$this->database";
                 case 'sqlite':
                     return "$this->driver:$this->address";
+                case 'unix_sockets':
+                    return "$this->driver:dbname=$this->database;unix_socket=$this->address/$this->port";
             }
         }
 
